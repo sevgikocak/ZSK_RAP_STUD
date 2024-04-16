@@ -1,0 +1,64 @@
+managed implementation in class zbp_i_student_002 unique;
+//strict ( 2 );
+with draft;
+
+define behavior for ZI_STUDENT_002 alias Student
+persistent table zsk_rap_002
+draft table ZDR_RAP_002
+lock master total etag Lastchangedat
+authorization master (global, instance )
+etag master Locallastchagedat
+{
+  create;
+  update (precheck);
+  delete;
+  association _academires { create; with draft;}
+
+  field ( numbering : managed, readonly ) Id;
+  field (  readonly ) Genderdesc;
+  action ( features : instance , authorization : update) setAdmitted result [1] $self;
+  validation validateAge on save {field Age; create;}
+
+  determination updateCourseDuration on save {field Course;}
+
+  mapping for zsk_rap_002
+    {
+      Id             = id;
+      Firstname      = firstname;
+      Lastname       = lastname;
+      Age            = age;
+      Course         = course;
+      Courseduration = courseduration;
+      Status         = status;
+      Gender         = gender;
+      Dob            = dob;
+    }
+}
+
+
+define behavior for ZI_AR_002 alias AcademicResult
+persistent table zsk_rap_ar_002
+draft table ZDR_RAP_AR_002
+lock dependent by _student
+authorization dependent by _student
+etag dependent by _student
+{
+  update;
+  delete;
+  association _student;
+
+  field ( readonly ) Id;
+  field ( readonly ) course_desc;
+  field ( readonly ) semester_desc;
+  field ( readonly ) semres_desc;
+
+
+  mapping for zsk_rap_ar_002
+    {
+      Id        = id;
+      Course    = course;
+      Semester  = semester;
+      Semresult = Semresult;
+    }
+
+}
